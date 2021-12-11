@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<launch>
+<!-- <arg name="urdf_robot_file" default="$(find panporter_pkg)/urdf/panporter.urdf.xacro" /> -->
+	<group ns="panporter">
+		<!-- Spawn part -->
+		<arg name="x" value="0" />
+		<arg name="y" value="0" />
+		<arg name="z" value="0.35" />
+		
+		<arg name="robot_name" default="panporter" />
+
+		<!-- the controllers configuration -->
+    <rosparam file="$(find panporter_pkg)/config/panporter_control.yaml" command="load"/>
+		
+  	<param name="robot_description" command="$(find xacro)/xacro --inorder $(find panporter_pkg)/urdf/panporter.urdf.xacro" />
+		<!-- <node name="panporter_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+		      args="-urdf -x $(arg x) -y $(arg y) -z $(arg z) -model $(arg robot_name) -param robot_descriprion"/> -->
+
+		<!-- load the controllers -->
+        <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+              output="screen" args="joint_state_controller
+																		wheel_right_joint_velocity_controller
+                                    wheel_left_joint_velocity_controller
+                                    prism_left_joint_position_controller
+																		prism_right_joint_position_controller --shutdown-timeout 10"
+              ns="/panporter"/>
+
+		<!-- the robot state publisher -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher"
+        respawn="false" output="screen">
+    	<param name="publish_frequency" type="double" value="5.0"/>
+    </node>
+	</group>
+</launch>

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<launch>
+<!-- <arg name="urdf_robot_file" default="$(find panporter_pkg)/urdf/panporter.urdf.xacro" /> -->
+    
+    <!-- These are the arguments you can pass to this launch file, for example paused:=true -->
+    <arg name="robot" default="machines"/>
+    <arg name="debug" default="false"/>
+    <arg name="gui" default="true"/>
+    <arg name="headless" default="false"/>
+    <arg name="pause" default="false"/>
+
+    <!-- start gazebo with a plank world -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find spawn_robot_tools_pkg)/worlds/model.world"/> 
+        <!-- Note: the world_name is with respect to GAZEBO_RESOURCE_PATH environmental variable -->
+        <arg name="debug" value="false"/>
+        <arg name="gui" value="true"/>
+        <arg name="paused" value="false"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="headless" value="$(arg headless)"/>
+        <!-- <arg name="recording" value="false"/> -->
+    </include>
+    <include file="$(find panporter_pkg)/launch/panporter_complete.launch"/>
+</launch>

@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<launch>
+
+	<arg name="model" default="panporter"/>
+	<arg name="gui" default="False" />
+	<!-- <param name="robot_description" textfile="$(find panporter_pkg)/urdf/panporter.urdf.xacro" /> -->
+  <param name="robot_description" command="$(find xacro)/xacro --inorder $(find panporter_pkg)/urdf/panporter.urdf.xacro" />
+
+  <arg name="x_pos" default="-2.0"/>
+  <arg name="y_pos" default="-0.5"/>
+  <arg name="z_pos" default="0.0"/>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find panporter_pkg)/worlds/maze.world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+	<!-- <include file="$(find panporter_pkg)/launch/panporter_spawner.launch"/> -->
+
+	<node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf"  args="-urdf -model $(arg model) -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -param robot_description" />
+
+
+	<param name="use_gui" value="$(arg gui)"/>
+	<param name="joy_node/dev" value="/dev/input/js1"/>
+	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ></node>
+	<!-- <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" /> -->
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find panporter_pkg)/config/config.rviz" />
+	<node name="odom" pkg="panporter_pkg" type="odom" ></node> 
+	<node name="joy_node" pkg="joy" type="joy_node"> </node>
+	<node name="c8_teleop_joy" pkg="panporter_pkg" type="teleop_joy" ></node>
+	<node name="my_motion" pkg="panporter_pkg" type="my_motion" ></node>
+
+	<include file="$(find panporter_pkg)/launch/panporter_spawner.launch"/>
+	
+</launch>

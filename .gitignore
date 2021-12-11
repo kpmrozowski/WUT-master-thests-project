@@ -1,3 +1,10 @@
+devel
+build
+req.txt
+stop.sh
+.catkin_tools/
+.catkin_workspace
+
 # Prerequisites
 *.d
 
