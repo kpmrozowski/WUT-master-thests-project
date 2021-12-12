@@ -7,7 +7,7 @@
   <param name="robot_description" command="$(find xacro)/xacro --inorder $(find panporter_pkg)/urdf/panporter.urdf.xacro" />
 
   <arg name="x_pos" default="-2.0"/>
-  <arg name="y_pos" default="-0.5"/>
+  <arg name="y_pos" default="-10.5"/> <!-- -0.5 -->
   <arg name="z_pos" default="0.0"/>
 
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
@@ -28,7 +28,7 @@
 	<param name="joy_node/dev" value="/dev/input/js1"/>
 	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ></node>
 	<!-- <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" /> -->
-	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find panporter_pkg)/config/config.rviz" />
+	<!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find panporter_pkg)/config/config.rviz" /> -->
 	<node name="odom" pkg="panporter_pkg" type="odom" ></node> 
 	<node name="joy_node" pkg="joy" type="joy_node"> </node>
 	<node name="c8_teleop_joy" pkg="panporter_pkg" type="teleop_joy" ></node>

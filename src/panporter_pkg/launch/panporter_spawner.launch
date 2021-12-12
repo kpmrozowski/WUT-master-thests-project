@@ -21,8 +21,7 @@
               output="screen" args="joint_state_controller
 																		wheel_right_joint_velocity_controller
                                     wheel_left_joint_velocity_controller
-                                    prism_left_joint_position_controller
-																		prism_right_joint_position_controller --shutdown-timeout 10"
+                                    prism_joint_position_controller --shutdown-timeout 10"
               ns="/panporter"/>
 
 		<!-- the robot state publisher -->
