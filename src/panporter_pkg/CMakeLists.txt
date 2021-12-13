@@ -5,6 +5,9 @@ project(panporter_pkg)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  kdl_parser
+  robot_state_publisher
+  control_toolbox
   geometry_msgs
   joy
   nav_msgs
@@ -53,7 +56,7 @@ include_directories(
 ## Declare a C++ executable
 add_executable(teleop_joy src/teleop_joy.cpp)
 add_executable(odom src/odom.cpp)
-add_executable(my_motion src/my_motion.cpp)
+add_executable(my_motion src/my_motion.cpp src/pid.cpp)
 # add_executable(panporter_control src/panporter_control.cpp)
 
 ## Specify libraries to link a library or executable target against

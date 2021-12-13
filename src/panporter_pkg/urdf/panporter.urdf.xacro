@@ -102,11 +102,35 @@
     <parent link="robot_cover"/>
     <child link="prism_left_link"/>
     <origin rpy="0 0 0" xyz="0 0.2 0"/>
-    <axis xyz="1 0 0" />
+    <axis xyz="-1 0 0" />
     <limit effort="3000" velocity="10.0" lower="-0.5" upper="0.5"/>
     <safety_controller k_position="20" k_velocity="20" soft_lower_limit="-0.45" soft_upper_limit="0.45"/>
     <dynamics damping="5" friction="1.0"/>
   </joint>
+
+  <!-- <joint name="spring_joint" type="prismatic">
+    <parent link="base_link"/>
+    <child link="prism_right_link"/>
+    <origin xyz="0 -0.2 0"/>
+    <axis> 
+      <xyz>1 0 0</xyz>
+      <limit lower="-0.001" upper="0.001"/>
+      <safety_controller k_position="20" k_velocity="20" soft_lower_limit="-0.15" soft_upper_limit="0.15"/>
+      <dynamics spring_stiffness="250" spring_reference="0.06" damping="50" friction="0.75"/>
+      <use_parent_model_frame>0</use_parent_model_frame>
+      <dynamics damping="50" friction="1.0"/>
+    <axis/>
+    <physics>
+      <ode>
+        <implicit_spring_damper>1</implicit_spring_damper>
+        <cfm_damping>1</cfm_damping>
+        <limit>
+          <cfm>0</cfm>
+          <erp>0.2</erp>
+        </limit>
+      </ode>
+    </physics>
+  </joint> -->
 
   <transmission name="prism_trans">
     <type>transmission_interface/SimpleTransmission</type>
