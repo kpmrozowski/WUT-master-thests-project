@@ -103,9 +103,9 @@
     <child link="prism_left_link"/>
     <origin rpy="0 0 0" xyz="0 0.2 0"/>
     <axis xyz="-1 0 0" />
-    <limit effort="3000" velocity="10.0" lower="-0.5" upper="0.5"/>
+    <limit effort="3000" velocity="50.0" lower="-0.5" upper="0.5"/>
     <safety_controller k_position="20" k_velocity="20" soft_lower_limit="-0.45" soft_upper_limit="0.45"/>
-    <dynamics damping="5" friction="1.0"/>
+    <dynamics damping="0.01" friction="0.1"/>
   </joint>
 
   <!-- <joint name="spring_joint" type="prismatic">
@@ -116,9 +116,9 @@
       <xyz>1 0 0</xyz>
       <limit lower="-0.001" upper="0.001"/>
       <safety_controller k_position="20" k_velocity="20" soft_lower_limit="-0.15" soft_upper_limit="0.15"/>
-      <dynamics spring_stiffness="250" spring_reference="0.06" damping="50" friction="0.75"/>
+      <dynamics spring_stiffness="250" spring_reference="0.06" damping="0.1" friction="0.75"/>
       <use_parent_model_frame>0</use_parent_model_frame>
-      <dynamics damping="50" friction="1.0"/>
+      <dynamics damping="0.1" friction="1.0"/>
     <axis/>
     <physics>
       <ode>
@@ -147,7 +147,7 @@
     <pose>0 0 0.35 0 0 0</pose>
     <visual>
       <geometry>
-        <mesh filename="package://panporter_pkg/meshes/robot_parts/wheel.stl" scale="1.0 1.0 1.0"/>
+        <mesh filename="package://panporter_pkg/meshes/robot_parts/wheel2.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <!-- <material name="red">
@@ -157,7 +157,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://panporter_pkg/meshes/robot_parts/wheel.stl" scale="1.0 1.0 1.0"/>
+        <mesh filename="package://panporter_pkg/meshes/robot_parts/wheel2.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <surface></surface>
     </collision>
@@ -172,8 +172,8 @@
     <child link="wheel_left_link"/>
     <origin rpy="0 0 0" xyz="0 0.1 0"/>
     <axis xyz="0 1 0" />
-    <limit effort="50" velocity="10000"/>
-    <dynamics damping="5" friction="1"/>
+    <limit effort="500" velocity="1000"/>
+    <dynamics damping="0.1" friction="0.1"/>
   </joint>
 
   <transmission name="wheel_left_trans">
@@ -192,7 +192,7 @@
     <pose>0 0 0.35 0 0 0</pose>
     <visual>
       <geometry>
-        <mesh filename="package://panporter_pkg/meshes/robot_parts/wheel.stl" scale="1.0 1.0 1.0"/>
+        <mesh filename="package://panporter_pkg/meshes/robot_parts/wheel2.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <!-- <material name="red">
@@ -201,7 +201,7 @@
     </visual>
     <collision>
       <geometry>
-        <mesh filename="package://panporter_pkg/meshes/robot_parts/wheel.stl" scale="1.0 1.0 1.0"/>
+        <mesh filename="package://panporter_pkg/meshes/robot_parts/wheel2.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0"/>
     </collision>
@@ -216,8 +216,8 @@
     <child link="wheel_right_link"/>
     <origin rpy="0 0 0" xyz="0 -0.1 0"/>
     <axis xyz="0 1 0" />
-    <limit effort="50" velocity="10000"/> <!-- lower="-1.570796327" upper="1.570796327"/> -->
-    <dynamics damping="5" friction="1"/>
+    <limit effort="500" velocity="1000"/> <!-- lower="-1.570796327" upper="1.570796327"/> 6.283-->
+    <dynamics damping="0.01" friction="0.1"/>
   </joint>
 
   <transmission name="wheel_right_trans">
@@ -363,15 +363,21 @@
   <!-- wheel_left_link -->
 	<gazebo reference="wheel_left_link">
 		<material value="Gazebo/Red"/>
-    <mu1>100.0</mu1>
-    <mu2>100.0</mu2>
+    <mu1>0.7</mu1>
+    <mu2>0.7</mu2>
+    <minDepth>0.001</minDepth>
+    <kp>40000000.0</kp>
+    <kd>0.5</kd>
 	</gazebo>
 
   <!-- wheel_right_link -->
 	<gazebo reference="wheel_right_link">
 		<material value="Gazebo/Green"/>
-    <mu1>100.0</mu1>
-    <mu2>100.0</mu2>
+    <mu1>0.7</mu1>
+    <mu2>0.7</mu2>
+    <minDepth>0.005</minDepth>
+    <kp>40000000.0</kp>
+    <kd>0.5</kd>
 	</gazebo>
 
   <gazebo>

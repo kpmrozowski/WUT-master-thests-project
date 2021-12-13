@@ -3,7 +3,6 @@
 #include <std_msgs/Float64.h>
 #include <std_msgs/String.h>
 #include <kdl/tree.hpp>
-// #include <robot_state_publisher/joint_state_listener.h>
 #include <robot_state_publisher/robot_state_publisher.h>
 #include <kdl_parser/kdl_parser.hpp>
 #include <sensor_msgs/JointState.h>
@@ -41,18 +40,24 @@ private:
   ros::NodeHandle nh_, nh_private_;
   ros::Publisher pub_wheel_left_, pub_wheel_right_, pub_prism_, pub_debug_joy_, pub_debug_imu_, pub_debug_js_;
   ros::Subscriber joy_sub_, imu_sub_, joint_state_sub_;
-  float max_linear_vel_ = 10;
-  float max_angular_vel_ = 1.5707*4;
+	// float vel_angular_z_;
+	float vel_linear_x_;
+  float max_linear_vel_ = 5;
+  float max_angular_vel_ = 2 * M_PI;
+  float max_m_vel_ = 4.;
   std::size_t axis_count_;
-  control_toolbox::Pid pid_ros_;
-  double pid_p_=0., pid_i_=0., pid_d_=0., pid_imax=0., pid_i_min_=0.;
+  control_toolbox::Pid pid_m_, pid_lr_;
   bool pid_antiwindup_ = false;
-  double error_;
+  double angle_error_;
   ros::Time cmd_last_time_;
-  double cmd_now_= 0.0, cmd_last_= 0.0;
-  double x_state_ = 0.0, x_desired_state_ = 0.0;
+  double pid_cmd_m_= 0.0, pid_cmd_lr_ = 0.0;
+  double joy_cmd_m_= 0.0, joy_cmd_l_ = 0.0, joy_cmd_r_ = 0.0;
+  double angle_state_ = 0.0, angle_desired_state_ = 0.0;
+  double m_state_ = 0.0, l_state_ = 0.0, r_state_ = 0.0;
   int counter1_ = 0;
   int counter1_limit_ = 100;
+  double pid_m_p_= -10.,  pid_m_i_= -1*1e-5,  pid_m_d_= -5*1e3,  pid_m_imax_= 1e5,  pid_m_imin_= -1e5;
+  double pid_lr_p_= -10., pid_lr_i_= -1*1e-5, pid_lr_d_= -5*1e3, pid_lr_imax_= 1e5, pid_lr_imin_= -1e5;
 };
 
 PanporterMotion::PanporterMotion(const KDL::Tree& tree, const double publish_frequency) : state_publisher_(tree), publish_rate_(publish_frequency)
@@ -70,9 +75,10 @@ PanporterMotion::PanporterMotion(const KDL::Tree& tree, const double publish_fre
   double publish_freq;
   if (nh_private_.param("publish_frequency", publish_freq, publish_frequency)) return;
   publish_rate_ = ros::Rate(publish_freq);
-  pid_ros_ = control_toolbox::Pid(- 10., - 1 * 1e-5, - 5 * 1e5, 1e5, -1e5);
+  pid_m_ =  control_toolbox::Pid(pid_m_p_,  pid_m_i_,  pid_m_d_,  pid_m_imax_,  pid_m_imin_);
+  pid_lr_ = control_toolbox::Pid(pid_lr_p_, pid_lr_i_, pid_lr_d_, pid_lr_imax_, pid_lr_imin_);
 }
-// -1e-3  |  prism_joint=-0.44  |  x_state_=0.011  |  ie - rising
+// -1e-3  |  prism_joint=-0.44  |  angle_state_=0.011  |  ie_m - rising
 void PanporterMotion::callbackJointState(const sensor_msgs::JointStateConstPtr& state) {
   if (state->name.size() != state->position.size()){
     ROS_ERROR("Robot state publisher received an invalid joint state vector");
@@ -84,6 +90,9 @@ void PanporterMotion::callbackJointState(const sensor_msgs::JointStateConstPtr& 
   for (unsigned int i = 0; i < state->name.size(); ++i)
     joint_positions.insert(make_pair(state->name[i], state->position[i]));
   // state_publisher_.publishTransforms(joint_positions, state->header.stamp, "panporter-");
+  m_state_ = state->position[0];
+  l_state_ = state->position[1];
+  r_state_ = state->position[2];
   
   // debug
   std_msgs::String debug_msg;
@@ -103,71 +112,79 @@ void PanporterMotion::imuCallback(const sensor_msgs::Imu::ConstPtr& msg)
     msg->orientation.z,
     msg->orientation.w
   );
-  x_state_ = msg->orientation.y;
-  if (x_state_ > 0.12 || x_state_ < -0.12) x_state_ = x_desired_state_;
+  angle_state_ = msg->orientation.y;
+  if (angle_state_ > 0.12 || angle_state_ < -0.12) angle_state_ = angle_desired_state_;
   
   // I1 - integral max, I2 - integrtal min
   // https://docs.ros.org/en/diamondback/api/control_toolbox/html/classcontrol__toolbox_1_1Pid.html
   // https://github.com/awesomebytes/control_toolbox_pid_tutorial
-  double pe, ie, de;
-  pid_ros_.getCurrentPIDErrors(&pe, &ie, &de);
   ros::Time tnow = ros::Time::now();
+  angle_error_ = angle_state_ - angle_desired_state_;
   ros::Duration dt = tnow - cmd_last_time_;
-  double error = x_state_ - x_desired_state_;
+  pid_cmd_m_ = 1. * pid_m_.computeCommand(angle_error_, dt);
+  pid_cmd_lr_ = 1. * pid_lr_.computeCommand(angle_error_, dt);
+  // pid_cmd_m_ = sgn(pid_cmd_m_) * pow(abs(pid_cmd_m_), 0.25);
+  // pid_cmd_lr_ = sgn(pid_cmd_m_) * pow(abs(pid_cmd_m_), 0.25);
   
-  if (counter1_ > counter1_limit_) {
-    // pid_ros_.setGains(pid_p_, pid_i_, pid_d_, pid_imax, pid_i_min_, pid_antiwindup_);
-    counter1_=0;
-  }
-  ++counter1_;
   
-  cmd_now_ = 1. * pid_ros_.computeCommand(error, dt);
-  cmd_now_ = sgn(cmd_now_) * pow(abs(cmd_now_), 0.5);
-  
-  // PID pid = PID(0.1, 100, -100, 0.1, 0.01, 0.5);
-  // double val = 20;
-  // for (int i = 0; i < 100; i++) {
-  //     double inc = pid.calculate(0, val);
-  //     printf("val:% 7.3f inc:% 7.3f\n", val, inc);
-  //     val += inc;
-  // }
-  
+  // if (angle_state_ < 0.02 && angle_state_ > -0.02 && ) (angle_state_ < M_PI / 2) {
+  // if (abs(joy_cmd_m_) < 0.01) joy_cmd_m_ = - 10. * m_state_;
+  std_msgs::Float64 wheel_left_vel_msg;
+  std_msgs::Float64 wheel_right_vel_msg;
   std_msgs::Float64 prism_pos_msg;
-  if (x_state_ < M_PI) {
-    prism_pos_msg.data = cmd_now_;
-  } else {
-    // robot is upside-down...
-    prism_pos_msg.data = x_state_;
-  }
+  wheel_left_vel_msg.data = joy_cmd_l_;// + pid_cmd_lr_;
+  wheel_right_vel_msg.data = joy_cmd_r_;// + pid_cmd_lr_;
+  prism_pos_msg.data = joy_cmd_m_;// + pid_cmd_m_;
+  
+  // if (counter1_ > counter1_limit_) {
+  //   counter1_=0;
+  //   joy_cmd_l_ = 0.0; joy_cmd_r_ = 0.0;
+  // }
+  // ++counter1_;
+  pub_wheel_left_.publish(wheel_left_vel_msg);
+  pub_wheel_right_.publish(wheel_right_vel_msg);
   pub_prism_.publish(prism_pos_msg);
-
+  
   // debug
+  double pe_m,  ie_m,  de_m;
+  double pe_lr, ie_lr, de_lr;
+  pid_m_.getCurrentPIDErrors(&pe_m, &ie_m, &de_m);
+  pid_lr_.getCurrentPIDErrors(&pe_lr, &ie_lr, &de_lr);
   std_msgs::String debug_msg;
-  debug_msg.data = "cmd_now_=" + str(cmd_now_) + ", pe=" + str(- 10. * pe) + ", ie=" + str(-5e-5 * ie) + ", de=" + str(5e5 * de) + ", x_state_=" + str(x_state_);
+  debug_msg.data = "pid_cmd_m_ ="  + str(pid_cmd_m_) + ", pe_m ="  + str(pid_m_p_ * pe_m)  + ", ie_m ="  + str(pid_m_i_ * ie_m)  + ", de_m =" + str(pid_m_d_ * de_m)    + ",                  "
+                 + "pid_cmd_lr_=" + str(pid_cmd_lr_) + ", pe_lr=" + str(pid_lr_p_ * pe_lr) + ", ie_lr=" + str(pid_lr_i_ * ie_lr) + ", de_lr=" + str(pid_lr_d_ * de_lr)
+                 + ", angle_state_=" + str(angle_state_);
   pub_debug_imu_.publish(debug_msg);
 }
 
 void PanporterMotion::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 {
-  std_msgs::Float64 wheel_left_vel_msg;
-  std_msgs::Float64 wheel_right_vel_msg;
-  std_msgs::Float64 prism_pos_msg;
-	float vel_angular_z = joy->axes[0];
-	float vel_linear_x = joy->axes[1];
-  // float prism_pos = joy->axes[4];
-
-
-  wheel_left_vel_msg.data = 40 * (max_linear_vel_ * vel_linear_x - max_angular_vel_ * vel_angular_z * robot_width_ / 2.) / wheel_radious_;
-  wheel_right_vel_msg.data = 40. * (max_linear_vel_ * vel_linear_x + max_angular_vel_ * vel_angular_z * robot_width_ / 2.) / wheel_radious_;
+	double vel_angular_z = joy->axes[0];
+	vel_linear_x_ = joy->axes[1];
+  joy_cmd_m_ = max_m_vel_ * joy->axes[4];
+  if      (joy->buttons[0]) pid_m_p_ *= 1.5;
+  else if (joy->buttons[1]) pid_m_p_ /= 1.5;
+  else if (joy->buttons[2]) pid_m_i_ *= 1.5;
+  else if (joy->buttons[3]) pid_m_i_ /= 1.5;
+  else if (joy->buttons[4]) pid_m_d_ *= 1.5;
+  else if (joy->buttons[5]) pid_m_d_ /= 1.5;
+  else if (joy->buttons[6]) pid_m_imax_ *= 1.5;
+  else if (joy->buttons[7]) pid_m_imax_ /= 1.5;
+  else if (joy->buttons[8]) pid_m_imin_ *= 1.5;
+  else if (joy->buttons[9]) pid_m_imin_ /= 1.5;
+  pid_m_.setGains(pid_m_p_, pid_m_i_, pid_m_d_, pid_m_imax_, pid_m_imin_, pid_antiwindup_);
+  
   // prism_pos_msg.data = -prism_pos / 2.;
-  pub_wheel_left_.publish(wheel_left_vel_msg);
-  pub_wheel_right_.publish(wheel_right_vel_msg);
-  // pub_prism_.publish(prism_pos_msg);
+  joy_cmd_l_ = (max_linear_vel_ * vel_linear_x_ - max_angular_vel_ * vel_angular_z * robot_width_ / 2.) / wheel_radious_;
+  joy_cmd_r_ = (max_linear_vel_ * vel_linear_x_ + max_angular_vel_ * vel_angular_z * robot_width_ / 2.) / wheel_radious_;
   
   // debug
-  // std_msgs::String debug_msg;
-  // debug_msg.data = "cmd_now_=" + str(joy->buttons.);
-  // pub_debug_joy_.publish(debug_msg);
+  std_msgs::String debug_msg;
+  // debug_msg.data = "buttons: ";
+  // for (int i = 0; i < joy->buttons.size(); ++i)
+  //   debug_msg.data += "b" + str(i) + "=" + str(joy->buttons[i]) + ",";
+  debug_msg.data = "\np=" + str(pid_m_p_) + ",i=" + str(pid_m_i_*1e5) + ",d=" + str(pid_m_d_*1e-3) + ",Imax=" + str(pid_m_imax_*1e-5) + ",Imin=" + str(pid_m_imin_*1e-5);
+  pub_debug_joy_.publish(debug_msg);
 }
 
 void PanporterMotion::velCallback(const geometry_msgs::Twist::ConstPtr& vel)
@@ -177,8 +194,8 @@ void PanporterMotion::velCallback(const geometry_msgs::Twist::ConstPtr& vel)
   std_msgs::Float64 wheel_left_vel_msg;
   std_msgs::Float64 wheel_right_vel_msg;
   std_msgs::Float64 prism_pos;
-  wheel_left_vel_msg.data = 200 * (vel->linear.x - 10 * vel->angular.z * robot_width_ / 2) ;
-  wheel_right_vel_msg.data = 200 * (vel->linear.x + 10 * vel->angular.z * robot_width_ / 2);
+  wheel_left_vel_msg.data  = (vel->linear.x - 10 * vel->angular.z * robot_width_ / 2);
+  wheel_right_vel_msg.data = (vel->linear.x + 10 * vel->angular.z * robot_width_ / 2);
   prism_pos.data = 0.0;
   pub_wheel_left_.publish(wheel_left_vel_msg);
   pub_wheel_right_.publish(wheel_right_vel_msg);
