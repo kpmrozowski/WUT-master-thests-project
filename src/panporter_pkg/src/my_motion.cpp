@@ -60,15 +60,15 @@ private:
 PanporterMotion::PanporterMotion(const KDL::Tree& tree, const double publish_frequency) : state_publisher_(tree), publish_rate_(publish_frequency)
 {
   // vel_sub_ = nh_.subscribe("cmd_vel", 10, &PanporterMotion::velCallback, this);
-  joint_state_sub_ = nh_.subscribe<sensor_msgs::JointState>("/panporter/joint_states", 1, &PanporterMotion::callbackJointState, this);
-	imu_sub_ = nh_.subscribe<sensor_msgs::Imu>("/panporter/imu", 100, &PanporterMotion::imuCallback, this);
+  joint_state_sub_ = nh_.subscribe<sensor_msgs::JointState>("/panporter1/joint_states", 1, &PanporterMotion::callbackJointState, this);
+	imu_sub_ = nh_.subscribe<sensor_msgs::Imu>("/panporter1/imu", 100, &PanporterMotion::imuCallback, this);
 	joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy", 100, &PanporterMotion::joyCallback, this);
-  pub_wheel_left_  = nh_.advertise<std_msgs::Float64>("/panporter/wheel_left_joint_velocity_controller/command", 100);
-  pub_wheel_right_ = nh_.advertise<std_msgs::Float64>("/panporter/wheel_right_joint_velocity_controller/command", 100);
-  pub_prism_  = nh_.advertise<std_msgs::Float64>("/panporter/prism_joint_position_controller/command", 100);
-  pub_debug_joy_ = nh_.advertise<std_msgs::String>("/panporter/debug_joy", 100);
-  pub_debug_imu_ = nh_.advertise<std_msgs::String>("/panporter/debug_imu", 100);
-  pub_debug_js_ = nh_.advertise<std_msgs::String>("/panporter/debug_js", 100);
+  pub_wheel_left_  = nh_.advertise<std_msgs::Float64>("/panporter1/wheel_left_joint_velocity_controller/command", 100);
+  pub_wheel_right_ = nh_.advertise<std_msgs::Float64>("/panporter1/wheel_right_joint_velocity_controller/command", 100);
+  pub_prism_  = nh_.advertise<std_msgs::Float64>("/panporter1/prism_joint_position_controller/command", 100);
+  pub_debug_joy_ = nh_.advertise<std_msgs::String>("/panporter1/debug_joy", 100);
+  pub_debug_imu_ = nh_.advertise<std_msgs::String>("/panporter1/debug_imu", 100);
+  pub_debug_js_ = nh_.advertise<std_msgs::String>("/panporter1/debug_js", 100);
   double publish_freq;
   if (nh_private_.param("publish_frequency", publish_freq, publish_frequency)) return;
   publish_rate_ = ros::Rate(publish_freq);
@@ -86,7 +86,7 @@ void PanporterMotion::callbackJointState(const sensor_msgs::JointStateConstPtr& 
   std::map<std::string, double> joint_positions;
   for (unsigned int i = 0; i < state->name.size(); ++i)
     joint_positions.insert(make_pair(state->name[i], state->position[i]));
-  // state_publisher_.publishTransforms(joint_positions, state->header.stamp, "panporter-");
+  // state_publisher_.publishTransforms(joint_positions, state->header.stamp, "panporter1-");
   m_state_ = state->position[0];
   l_state_ = state->position[1];
   r_state_ = state->position[2];

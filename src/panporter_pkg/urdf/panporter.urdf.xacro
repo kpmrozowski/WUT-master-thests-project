@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <robot name="panporter" xmlns:xacro="http://www.ros.org/wiki/xacro">
-
+<xacro:arg name="my_namespace" default="panporter"/>
+ 
 <!-- * * * link definitions * * * -->
   <link name="base_footprint"/>
 
@@ -327,13 +328,13 @@
 
   <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
-      <robotNamespace>/panporter</robotNamespace>
+      <robotNamespace>/$(arg my_namespace)</robotNamespace>
       <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
       <controlPeriod>0.001</controlPeriod>
       <legacyModeNS>false</legacyModeNS>
     </plugin>
     <plugin name='gazebo_ros_imu' filename='libhector_gazebo_ros_imu.so'>
-      <robotNamespace>/panporter</robotNamespace>
+      <robotNamespace>/$(arg my_namespace)</robotNamespace>
       <alwaysOn>true</alwaysOn>
       <updateRate>200.0</updateRate>
       <bodyName>robot_cover</bodyName>
@@ -383,7 +384,7 @@
 
   <gazebo>
     <plugin name="imu_plugin" filename="libgazebo_ros_imu.so">
-      <robotNamespace>/panporter</robotNamespace>
+      <robotNamespace>/$(arg my_namespace)</robotNamespace>
       <alwaysOn>true</alwaysOn>
       <bodyName>imu_link</bodyName>
       <frameName>imu_link</frameName>
@@ -463,7 +464,7 @@
         </clip>
       </camera> 
       <plugin name="camera_plugin" filename="libgazebo_ros_openni_kinect.so">
-        <robotNamespace>/panporter</robotNamespace>
+        <robotNamespace>/$(arg my_namespace)</robotNamespace>
         <baseline>0.1</baseline>
         <alwaysOn>true</alwaysOn>
         <!-- Keep this zero, update_rate in the parent <sensor> tag

@@ -14,7 +14,7 @@
     <!-- <arg name="world_name" value="$(find panporter_pkg)/worlds/maze.world"/> -->
     <!-- <arg name="world_name" value="$(find panporter_pkg)/worlds/arxiv_maze.world"/> -->
     <arg name="world_name" value="$(find panporter_pkg)/worlds/empty_world.world"/>
-    <arg name="paused" value="true"/>
+    <arg name="paused" value="false"/>
     <arg name="use_sim_time" value="true"/>
     <arg name="gui" value="true"/>
     <arg name="headless" value="false"/>
