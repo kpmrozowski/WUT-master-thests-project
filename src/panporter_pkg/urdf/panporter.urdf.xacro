@@ -299,6 +299,7 @@
     </inertial>-->
   </link>
 
+<!-- Gazebo cheet-sheet: http://sdformat.org/spec?ver=1.6&elem=physics  -->
   <gazebo>
     <plugin filename="libgazebo_ros_diff_drive.so" name="differential_drive_controller">
       <alwaysOn>true</alwaysOn>
