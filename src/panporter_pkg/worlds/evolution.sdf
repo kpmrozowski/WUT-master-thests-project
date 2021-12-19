@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+    <physics type='ode'>
+      <max_step_size>0.005</max_step_size>
+      <real_time_factor>20</real_time_factor>
+      <real_time_update_rate>4000</real_time_update_rate>
+    </physics>
+    <gravity>0.0 0.0 -9.81</gravity>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+  </world>
+</sdf>

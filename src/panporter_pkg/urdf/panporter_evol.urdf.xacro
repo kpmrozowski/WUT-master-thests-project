@@ -195,66 +195,7 @@
 
   <link name="imu_link"/>
 
-  <joint name="scan_joint" type="fixed">
-    <parent link="robot_cover"/>
-    <child link="base_scan"/>
-    <origin xyz="0 0 -0.045" rpy="0 0 0"/>
-  </joint>
-
-  <link name="base_scan">
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <!-- <cylinder length="0.0315" radius="0.055"/> -->
-        <mesh filename="package://panporter_pkg/meshes/sensors/lds.stl" scale="0.001 0.001 0.001"/>
-      </geometry>
-      <material name="dark"/>
-    </visual>
-    <collision>
-      <origin xyz="0.015 0 -0.0065" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.0315" radius="0.055"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.114" />
-      <origin xyz="0 0 0" />
-      <inertia ixx="0.001" ixy="0.0" ixz="0.0"
-               iyy="0.001" iyz="0.0"
-               izz="0.001" />
-    </inertial>
-  </link>
-
-  <joint name="camera_joint" type="fixed">
-    <origin xyz="0.2 0 0.2" rpy="0 0 0"/>
-    <parent link="robot_cover"/>
-    <child link="camera_link"/>
-  </joint>
-
-  <link name="camera_link">
-    <visual>
-      <origin xyz="0 0 0" rpy="1.570796327 0 1.570796327"/>
-      <geometry>
-       <mesh filename="package://panporter_pkg/meshes/sensors/zed2.dae"/>
-      </geometry>
-    </visual>
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 1.570796327"/>
-      <geometry>
-        <box size="0.012 0.132 0.020"/>
-      </geometry>
-    </collision>
-    <!-- This inertial field needs doesn't contain reliable data!! -->
-<!--   <inertial>
-      <mass value="0.564" />
-      <origin xyz="0 0 0" />
-      <inertia ixx="0.003881243" ixy="0.0" ixz="0.0"
-               iyy="0.000498940" iyz="0.0"
-               izz="0.003879257" />
-    </inertial>-->
-  </link>
-
-<!-- Gazebo cheet-sheet: http://sdformat.org/spec?ver=1.6&elem=physics  -->
+  <!-- Gazebo cheet-sheet: http://sdformat.org/spec?ver=1.6&elem=physics  -->
   <gazebo>
     <plugin filename="libgazebo_ros_diff_drive.so" name="differential_drive_controller">
       <alwaysOn>true</alwaysOn>
@@ -287,31 +228,23 @@
       <controlPeriod>0.001</controlPeriod>
       <legacyModeNS>false</legacyModeNS>
     </plugin>
+    <plugin name='gazebo_ros_imu' filename='libhector_gazebo_ros_imu.so'>
+      <robotNamespace>/$(arg my_namespace)</robotNamespace>
+      <alwaysOn>true</alwaysOn>
+      <updateRate>200.0</updateRate>
+      <bodyName>robot_cover</bodyName>
+      <topicName>/imu_bosch/data_raw</topicName>
+      <gaussianNoise>0.02</gaussianNoise>
+      <xyzOffsets>0 0 0</xyzOffsets>
+      <rpyOffsets>0 0 0</rpyOffsets>
+    </plugin>
   </gazebo>
 
   <!-- robot_cover -->
 	<gazebo reference="robot_cover">
-		<material value="Gazebo/Orange"/>
+		<material value="Gazebo/Yellow"/>
     <mu1>100.0</mu1>
     <mu2>100.0</mu2>
-    <!-- Contact Sensor -->
-    <sensor name="robot_cover_contactsensor" type="contact">
-      <always_on>true</always_on>
-      <visualize>true</visualize>
-      <update_rate>1000.</update_rate>
-      <pose>0 0 0.35 0 0 0</pose>
-      <contact>
-        <collision>base_footprint_fixed_joint_lump__robot_cover_collision</collision>
-        <topic>state_bumper</topic>
-      </contact>
-      <plugin name="robot_cover_plugin" filename="libgazebo_ros_bumper.so">
-        <robotNamespace>/$(arg my_namespace)</robotNamespace>
-        <bumperTopicName>state_bumper</bumperTopicName>
-        <frameName>robot_cover</frameName>
-        <alwayson>true</alwayson>
-        <updaterate>1000.0</updaterate>
-      </plugin>
-    </sensor>
 	</gazebo>
 
   <!-- prism_left_link -->
@@ -372,87 +305,6 @@
         </noise>
       </imu>
     </plugin>
-  </gazebo>
-
-  <gazebo reference="base_scan">
-    <material>Gazebo/FlatBlack</material>
-    <sensor type="ray" name="lds_lfcd_sensor">
-      <pose>0 0 0 0 0 0</pose>
-      <visualize>true</visualize>
-      <update_rate>5</update_rate>
-      <ray>
-        <scan>
-          <horizontal>
-            <samples>360</samples>
-            <resolution>1</resolution>
-            <min_angle>0.0</min_angle>
-            <max_angle>6.28319</max_angle>
-          </horizontal>
-        </scan>
-        <range>
-          <min>0.120</min>
-          <max>3.5</max>
-          <resolution>0.015</resolution>
-        </range>
-        <noise>
-          <type>gaussian</type>
-          <mean>0.0</mean>
-          <stddev>0.01</stddev>
-        </noise>
-      </ray>
-      <plugin name="gazebo_ros_lds_lfcd_controller" filename="libgazebo_ros_laser.so">
-        <topicName>scan</topicName>
-        <frameName>base_scan</frameName>
-      </plugin>
-    </sensor>
-  </gazebo>
-
-  <!--link : https://www.raspberrypi.org/documentation/hardware/camera/-->
-  <gazebo reference="camera_link"> 
-    <sensor type="depth" name="camera">
-      <visualize>true</visualize>
-      <always_on>true</always_on>
-      <update_rate>20.0</update_rate>
-      <camera>
-        <horizontal_fov>${60.0*2*1.570796327/180.0}</horizontal_fov>
-        <image>
-          <format>B8G8R8</format>
-          <width>640</width>
-          <height>480</height>
-        </image>
-        <clip>
-          <near>0.05</near>
-          <far>8.0</far>
-        </clip>
-      </camera> 
-      <plugin name="camera_plugin" filename="libgazebo_ros_openni_kinect.so">
-        <robotNamespace>/$(arg my_namespace)</robotNamespace>
-        <baseline>0.1</baseline>
-        <alwaysOn>true</alwaysOn>
-        <!-- Keep this zero, update_rate in the parent <sensor> tag
-          will control the frame rate. -->
-        <updateRate>10</updateRate>
-        <cameraName>camera</cameraName>
-        <imageTopicName>rgb/image_raw</imageTopicName>
-        <depthImageTopicName>depth/image_raw</depthImageTopicName>
-        <cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
-        <depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
-        <pointCloudTopicName>depth/points</pointCloudTopicName>
-        <frameName>robot_cover</frameName>
-        <pointCloudCutoff>0.5</pointCloudCutoff>
-        <pointCloudCutoffMax>3.0</pointCloudCutoffMax>
-        <distortion_k1>0.0</distortion_k1>
-        <distortion_k2>0.0</distortion_k2>
-        <distortion_k3>0.0</distortion_k3>
-        <distortion_t1>0.0</distortion_t1>
-        <distortion_t2>0.0</distortion_t2>
-        <CxPrime>0</CxPrime>
-        <Cx>0</Cx>
-        <Cy>0</Cy>
-        <focalLength>0</focalLength>
-        <hackBaseline>0</hackBaseline>
-      </plugin>
-    </sensor>
   </gazebo>
 
 </robot>

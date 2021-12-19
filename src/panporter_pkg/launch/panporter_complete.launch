@@ -1,8 +1,5 @@
 <?xml version="1.0"?>
 <launch>
-	<!-- <param name="robot_description" textfile="$(find panporter_pkg)/urdf/panporter.urdf.xacro" /> -->
-  	<param name="robot_description" command="$(find xacro)/xacro --inorder $(find panporter_pkg)/urdf/panporter.urdf.xacro my_namespace:=panporter1"/>
-
   	<include file="$(find gazebo_ros)/launch/empty_world.launch">
 		<arg name="world_name" value="$(find panporter_pkg)/worlds/maze.world"/>
 		<!-- <arg name="world_name" value="$(find panporter_pkg)/worlds/arxiv_maze.world"/> -->
@@ -11,6 +8,7 @@
 		<arg name="gui" value="true"/>
 		<arg name="headless" value="false"/>
 		<arg name="debug" value="false"/>
+		<arg name="extra_gazebo_args" value=" --verbose "/>
   	</include>
 
 	<include file="$(find panporter_pkg)/launch/panporter_spawner.launch">
@@ -19,7 +17,34 @@
 		<arg name="x_pos" value="-2.0"/>
 		<arg name="y_pos" value="-12.5"/> <!-- -0.5 -->
 		<arg name="z_pos" value="0.35"/>
-		<arg name="gui" value="False" />
+		<arg name="roll" default="0"/>
+		<arg name="pitch" default="0"/>
+		<arg name="yaw" default="0.0" />
+		<arg name="gui" value="false" />
 	</include>
+
+	<!-- <include file="$(find panporter_pkg)/launch/panporter_spawner.launch">
+		<arg name="namespace" value="panporter2"/>
+		<arg name="model" value="panporter2"/>
+		<arg name="x_pos" value="0.0"/>
+		<arg name="y_pos" value="-12.5"/>
+		<arg name="z_pos" value="0.35"/>
+		<arg name="roll" default="0"/>
+		<arg name="pitch" default="0"/>
+		<arg name="yaw" default="0.0" />
+		<arg name="gui" value="false" />
+	</include>
+
+	<include file="$(find panporter_pkg)/launch/panporter_spawner.launch">
+		<arg name="namespace" value="panporter3"/>
+		<arg name="model" value="panporter3"/>
+		<arg name="x_pos" value="2.0"/>
+		<arg name="y_pos" value="-12.5"/>
+		<arg name="z_pos" value="0.35"/>
+		<arg name="roll" default="0"/>
+		<arg name="pitch" default="0"/>
+		<arg name="yaw" default="0.0" />
+		<arg name="gui" value="false" />
+	</include> -->
 	
 </launch>
