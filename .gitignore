@@ -1,9 +1,14 @@
 .vscode
+.cache
+install
+logs
 out
 devel
 build
+UserConfig.txt
 req.txt
 stop.sh
+compile_commands.json
 .catkin_tools/
 .catkin_workspace
 

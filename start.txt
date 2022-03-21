@@ -1,0 +1,6 @@
+terminal 1: rosrun sjtu_drone start_gui
+terminal 2: rosrun drone_construct start_simulation.sh
+terminal 3: roslaunch drone_construct main.launch
+terminal 3: rostopic pub /drone/takeoff std_msgs/Empty "{}"
+terminal 4: rosrun teleop_twist_keyboard teleop_twist_keyboard.py
+
