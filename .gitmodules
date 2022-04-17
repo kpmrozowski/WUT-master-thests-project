@@ -1,15 +1,9 @@
-[submodule "src/dji_m100_gazebo"]
-	path = src/dji_m100_gazebo
-	url = https://github.com/dji-m100-ros/dji_m100_gazebo.git
 [submodule "src/Onboard-SDK-ROS"]
 	path = src/Onboard-SDK-ROS
 	url = https://github.com/dji-sdk/Onboard-SDK-ROS.git
-[submodule "src/dji_m100_description"]
-	path = src/dji_m100_description
-	url = https://github.com/dji-m100-ros/dji_m100_description.git
-[submodule "src/dji_m100_controllers_gazebo"]
-	path = src/dji_m100_controllers_gazebo
-	url = https://github.com/dji-m100-ros/dji_m100_controllers_gazebo.git
 [submodule "src/ardrone_autonomy"]
 	path = src/ardrone_autonomy
 	url = https://github.com/AutonomyLab/ardrone_autonomy.git
+[submodule "src/dji_m100_gazebo"]
+	path = src/dji_m100_gazebo
+	url = https://github.com/dji-m100-ros/dji_m100_gazebo.git

@@ -11,6 +11,9 @@ stop.sh
 compile_commands.json
 .catkin_tools/
 .catkin_workspace
+deps
+repos
+tutorials.rosinstall
 
 # Prerequisites
 *.d
