@@ -14,6 +14,9 @@ compile_commands.json
 deps
 repos
 tutorials.rosinstall
+src/orb_slam3_ros_wrapper/config/ORBvoc.txt
+meshes
+models
 
 # Prerequisites
 *.d
