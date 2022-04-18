@@ -15,8 +15,15 @@ deps
 repos
 tutorials.rosinstall
 src/orb_slam3_ros_wrapper/config/ORBvoc.txt
+*/*/*/dataset*
+ORB_SLAM3/Vocabulary
+ORB_SLAM3/evaluation
+ORB_SLAM3/Thirdparty
+ORB_SLAM3/lib
 meshes
 models
+datasets/
+ethz-data/
 
 # Prerequisites
 *.d

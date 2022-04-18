@@ -5,9 +5,7 @@
 */
 
 #include "common.h"
-#include <Converter.h>
-
-using ORB_SLAM3::Converter;
+#include <opencv2/core/eigen.hpp>
 
 using namespace std;
 
@@ -170,8 +168,10 @@ void ImageGrabber::SyncWithImu()
             if(mbClahe)
                 mClahe->apply(im,im);
 
-            // Main algorithm runs here
-            cv::Mat Tcw = Converter::toCvMat(Converter::toSE3Quat(mpSLAM->TrackMonocular(im, tIm, vImuMeas)));
+            cv::Mat Tcw;
+            Sophus::SE3f Tcw_SE3f = mpSLAM->TrackMonocular(im, tIm, vImuMeas);
+            Eigen::Matrix4f Tcw_Matrix = Tcw_SE3f.matrix();
+            cv::eigen2cv(Tcw_Matrix, Tcw);
 
             publish_ros_pose_tf(Tcw, current_frame_time, ORB_SLAM3::System::IMU_MONOCULAR);
 

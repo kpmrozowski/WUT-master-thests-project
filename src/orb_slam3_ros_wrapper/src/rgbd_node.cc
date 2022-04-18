@@ -5,7 +5,7 @@
 */
 
 #include "common.h"
-#include <Converter.h>
+#include <opencv2/core/eigen.hpp>
 
 using namespace std;
 
@@ -96,10 +96,13 @@ void ImageGrabber::GrabRGBD(const sensor_msgs::ImageConstPtr& msgRGB,const senso
         ROS_ERROR("cv_bridge exception: %s", e.what());
         return;
     }
+
+    cv::Mat Tcw;
+    Sophus::SE3f Tcw_SE3f = mpSLAM->TrackRGBD(cv_ptrRGB->image, cv_ptrD->image, cv_ptrRGB->header.stamp.toSec());
+    Eigen::Matrix4f Tcw_Matrix = Tcw_SE3f.matrix();
+    cv::eigen2cv(Tcw_Matrix, Tcw);
     
     // Main algorithm runs here
-    cv::Mat Tcw = ORB_SLAM3::Converter::toCvMat(ORB_SLAM3::Converter::toSE3Quat(mpSLAM->TrackRGBD(cv_ptrRGB->image, cv_ptrD->image, cv_ptrRGB->header.stamp.toSec())));
-
     ros::Time current_frame_time = cv_ptrRGB->header.stamp;
 
     publish_ros_pose_tf(Tcw, current_frame_time, ORB_SLAM3::System::STEREO);

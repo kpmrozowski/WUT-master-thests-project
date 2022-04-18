@@ -5,9 +5,7 @@
 */
 
 #include "common.h"
-#include <Converter.h>
-
-using ORB_SLAM3::Converter;
+#include <opencv2/core/eigen.hpp>
 
 using namespace std;
 
@@ -86,7 +84,10 @@ void ImageGrabber::GrabImage(const sensor_msgs::ImageConstPtr& msg)
     }
 
     // Main algorithm runs here
-    cv::Mat Tcw = Converter::toCvMat(Converter::toSE3Quat(mpSLAM->TrackMonocular(cv_ptr->image, cv_ptr->header.stamp.toSec())));
+    cv::Mat Tcw;
+    Sophus::SE3f Tcw_SE3f = mpSLAM->TrackMonocular(cv_ptr->image,cv_ptr->header.stamp.toSec());
+    Eigen::Matrix4f Tcw_Matrix = Tcw_SE3f.matrix();
+    cv::eigen2cv(Tcw_Matrix, Tcw);
 
     ros::Time current_frame_time = msg->header.stamp;
 

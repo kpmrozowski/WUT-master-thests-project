@@ -6,6 +6,9 @@ set(ORB_SLAM3_DIR
    /workspace/repos/ORB_SLAM3
 )
 # set(ORB_SLAM3_DIR
+# ${PROJECT_SOURCE_DIR}/../../ORB_SLAM3
+# )
+# set(ORB_SLAM3_DIR
 #    $ENV{HOME}/ORB_SLAM3
 # )
 

@@ -1,13 +1,13 @@
 <launch>
     <!-- Spawn simulated quadrotor uav -->
-    <arg name="sdf_robot_file" value="$(find sjtu_drone)/models/sjtu_drone/sjtu_drone.sdf"/>
+    <arg name="sdf_robot_file" value="$(find sjtu_drone)/models/sjtu_drone/sjtu_drone_stereo.sdf"/>
     <arg name="robot_name" value="sjtu_drone" />
-    <arg name="x" default="-26.0" />
-    <arg name="y" default="30.5" />
-    <arg name="z" default="0.2" />
     <!-- <arg name="x" default="-0.0" />
     <arg name="y" default="0.5" />
     <arg name="z" default="2" /> -->
+    <arg name="x" default="-26.0" />
+    <arg name="y" default="30.5" />
+    <arg name="z" default="0.2" />
     <arg name="roll" default="0.0"/>
     <arg name="pitch" default="0.0"/>
     <arg name="yaw" default="-1.570796327" />

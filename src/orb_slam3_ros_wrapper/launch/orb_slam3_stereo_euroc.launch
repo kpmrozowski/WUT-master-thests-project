@@ -1,6 +1,7 @@
 <launch>
     <node name="orb_slam3_stereo" pkg="orb_slam3_ros_wrapper" type="orb_slam3_ros_wrapper_stereo" output="screen">
         <!-- for EuRoC dataset -->
+        <!-- <remap from="/camera/left/image_raw"    to="/drone/front_camera/image_raw"/> -->
         <remap from="/camera/left/image_raw"    to="/cam0/image_raw"/>
         <remap from="/camera/right/image_raw"   to="/cam1/image_raw"/>
 

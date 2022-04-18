@@ -1,9 +1,3 @@
-/**
-* 
-* Common functions and variables across all modes (mono/stereo, with or w/o imu)
-*
-*/
-
 #include "common.h"
 
 ros::Publisher pose_pub;

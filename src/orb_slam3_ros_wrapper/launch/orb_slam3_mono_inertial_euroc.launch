@@ -1,9 +1,11 @@
 <launch>
     <!-- ORB-SLAM3 -->
-    <node name="orb_slam3_mono_inertial" pkg="orb_slam3_ros_wrapper" type="orb_slam3_ros_wrapper_mono_inertial" output="screen">
+    <node name="orb_slam3_mono_inertial" pkg="orb_slam3_ros_wrapper" type="orb_slam3_ros_wrapper_mono_inertial" output="screen" launch-prefix="xterm -e gdb --args">
         <!-- for EuRoC dataset -->
         <remap from="/camera/image_raw"         to="/cam0/image_raw"/>
-        <remap from="/imu"                      to="/imu0"/>
+        <!-- <remap from="/camera/image_raw"         to="/drone/front_camera/image_raw"/> -->
+        <!-- <remap from="/imu"                      to="/imu0"/> -->
+        <remap from="/imu"                      to="/drone/imu"/>
 
         <!-- Parameters for original ORB-SLAM3 -->
         <param name="voc_file"      type="string"   value="$(find orb_slam3_ros_wrapper)/config/ORBvoc.txt" />

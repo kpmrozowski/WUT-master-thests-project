@@ -5,9 +5,8 @@
 */
 
 #include "common.h"
-#include <Converter.h>
+#include <opencv2/core/eigen.hpp>
 
-using ORB_SLAM3::Converter;
 using namespace std;
 
 class ImuGrabber
@@ -253,8 +252,11 @@ void ImageGrabber::SyncWithImu()
         }
         
         // Main algorithm runs here
-        cv::Mat Tcw =  Converter::toCvMat(Converter::toSE3Quat(mpSLAM->TrackStereo(imLeft,imRight,tImLeft,vImuMeas)));
-
+        cv::Mat Tcw;
+        Sophus::SE3f Tcw_SE3f = mpSLAM->TrackStereo(imLeft,imRight,tImLeft,vImuMeas);
+        Eigen::Matrix4f Tcw_Matrix = Tcw_SE3f.matrix();
+        cv::eigen2cv(Tcw_Matrix, Tcw);
+        
         publish_ros_pose_tf(Tcw, current_frame_time, ORB_SLAM3::System::IMU_STEREO);
 
         publish_ros_tracking_mappoints(mpSLAM->GetTrackedMapPoints(), current_frame_time);

@@ -5,9 +5,7 @@
 */
 
 #include "common.h"
-#include <Converter.h>
-
-using ORB_SLAM3::Converter;
+#include <opencv2/core/eigen.hpp>
 
 using namespace std;
 
@@ -144,21 +142,24 @@ void ImageGrabber::GrabStereo(const sensor_msgs::ImageConstPtr& msgLeft,const se
         return;
     }
 
-    cv::Mat Tcw;
+    Sophus::SE3f Tcw_SE3f;
     if(do_rectify)
     {
         cv::Mat imLeft, imRight;
         cv::remap(cv_ptrLeft->image,imLeft,M1l,M2l,cv::INTER_LINEAR);
         cv::remap(cv_ptrRight->image,imRight,M1r,M2r,cv::INTER_LINEAR);
-        Tcw = Converter::toCvMat(Converter::toSE3Quat(mpSLAM->TrackStereo(imLeft,imRight,cv_ptrLeft->header.stamp.toSec())));
+        Tcw_SE3f = mpSLAM->TrackStereo(imLeft,imRight,cv_ptrLeft->header.stamp.toSec());
     }
     else
     {
-        Tcw = Converter::toCvMat(Converter::toSE3Quat(mpSLAM->TrackStereo(cv_ptrLeft->image,cv_ptrRight->image,cv_ptrLeft->header.stamp.toSec())));
+        Tcw_SE3f = mpSLAM->TrackStereo(cv_ptrLeft->image,cv_ptrRight->image,cv_ptrLeft->header.stamp.toSec());
     }
+    cv::Mat Tcw;
+    Eigen::Matrix4f Tcw_Matrix = Tcw_SE3f.matrix();
+    cv::eigen2cv(Tcw_Matrix, Tcw);
 
     ros::Time current_frame_time = cv_ptrLeft->header.stamp;
-
+    
     publish_ros_pose_tf(Tcw, current_frame_time, ORB_SLAM3::System::STEREO);
 
     publish_ros_tracking_mappoints(mpSLAM->GetTrackedMapPoints(), current_frame_time);
