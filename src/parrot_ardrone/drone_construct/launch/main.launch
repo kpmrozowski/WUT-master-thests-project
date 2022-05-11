@@ -2,21 +2,23 @@
 <launch>
   <include file="$(find drone_construct)/launch/start_world.launch">
     <!-- <arg name="world_name" value="$(find drone_construct)/worlds/ardrone_igniteworld.world"/> -->
-    <arg name="world_name" default="$(find drone_construct)/worlds/ardrone_inkubworld3.world"/>
+    <!-- <arg name="world_name" default="$(find drone_construct)/worlds/ardrone_inkubworld3.world"/> -->
+    <arg name="world_name" default="$(find drone_construct)/worlds/small_city.world"/>
+    <!-- <arg name="world_name" default="$(find drone_construct)/worlds/gazebo_multi_camera_monitor_plugin.world"/> -->
   </include>
   <include file="$(find drone_construct)/launch/put_robot_in_world.launch">
-    <!-- <arg name="x" value="0.0" />
+    <arg name="x" value="0.0" />
     <arg name="y" value="0.0" />
     <arg name="z" value="0.6" />
     <arg name="roll" value="0.0"/>
     <arg name="pitch" value="0.0"/>
-    <arg name="yaw" value="0"/> -->
-    <arg name="x" default="-26.0" />
+    <arg name="yaw" value="0"/>
+    <!-- <arg name="x" default="-26.0" />
     <arg name="y" default="30.5" />
     <arg name="z" default="0.2" />
     <arg name="roll" default="0.0"/>
     <arg name="pitch" default="0.0"/>
-    <arg name="yaw" default="-1.570796327" />
+    <arg name="yaw" default="-1.570796327" /> -->
   </include>
   <!-- <include file="$(find orb_slam3_ros_wrapper)/launch/orb_slam3_mono_inertial_euroc.launch"/> -->
   <!-- <include file="$(find orb_slam3_ros_wrapper)/launch/orb_slam3_stereo_euroc.launch"/> -->

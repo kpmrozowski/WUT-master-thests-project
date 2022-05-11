@@ -52,8 +52,8 @@ IMU.Frequency: 200
 # Stereo Rectification. Only if you need to pre-rectify the images.
 # Camera.fx, .fy, etc must be the same as in LEFT.P
 #--------------------------------------------------------------------------------------------
-LEFT.height: 480
-LEFT.width: 752
+LEFT.height: 360
+LEFT.width: 640
 LEFT.D: !!opencv-matrix
    rows: 1
    cols: 5
@@ -80,8 +80,8 @@ LEFT.P:  !!opencv-matrix
    dt: d
    data: [435.2046959714599, 0, 367.4517211914062, 0,  0, 435.2046959714599, 252.2008514404297, 0,  0, 0, 1, 0]
 
-RIGHT.height: 480
-RIGHT.width: 752
+RIGHT.height: 360
+RIGHT.width: 640
 RIGHT.D: !!opencv-matrix
    rows: 1
    cols: 5

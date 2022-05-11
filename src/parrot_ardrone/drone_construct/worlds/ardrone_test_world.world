@@ -202,7 +202,7 @@
               <name>House_1/Diffuse</name>
             </script>
             <shader type='normal_map_object_space'>
-              <normal_map>House_1_Normal.png</normal_map>
+              <normal_map>model://house_1/materials/textures/House_1_Normal.png</normal_map>
             </shader>
           </material>
         </visual>

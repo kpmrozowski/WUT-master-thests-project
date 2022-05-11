@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 2.8)
 project(orb_slam3_ros_wrapper)
 
 # Change this to your installation of ORB-SLAM3. Default is ~/
+# set(ORB_SLAM2_DIR
+# /workspace/deps/ORB_SLAM2
+# )
 set(ORB_SLAM3_DIR
    /workspace/repos/ORB_SLAM3
 )
@@ -44,6 +47,7 @@ catkin_package (
 
 include_directories(
    ${ORB_SLAM3_DIR}
+   # ${ORB_SLAM2_DIR}/include
    ${ORB_SLAM3_DIR}/include
    ${ORB_SLAM3_DIR}/include/CameraModels
    ${PROJECT_SOURCE_DIR}/include
@@ -55,6 +59,7 @@ include_directories(
 # Build ROS nodes
 set(LIBS
    ${ORB_SLAM3_DIR}/lib/libORB_SLAM3.so
+   # ${ORB_SLAM2_DIR}/lib/libORB_SLAM2.so
    ${EIGEN3_LIBS}
    ${catkin_LIBRARIES}
    ${Pangolin_LIBRARIES}
@@ -70,14 +75,14 @@ target_link_libraries(${PROJECT_NAME}_mono
    ${LIBS}
 )
 
-# mono-inertial node
-add_executable (${PROJECT_NAME}_mono_inertial
-   src/mono_inertial_node.cc
-   src/common.cc
-)
-target_link_libraries(${PROJECT_NAME}_mono_inertial
-   ${LIBS}
-)
+# # mono-inertial node
+# add_executable (${PROJECT_NAME}_mono_inertial
+#    src/mono_inertial_node.cc
+#    src/common.cc
+# )
+# target_link_libraries(${PROJECT_NAME}_mono_inertial
+#    ${LIBS}
+# )
 
 # stereo node
 add_executable (${PROJECT_NAME}_stereo
@@ -88,20 +93,20 @@ target_link_libraries(${PROJECT_NAME}_stereo
    ${LIBS}
 )
 
-# stereo-inertial node
-add_executable (${PROJECT_NAME}_stereo_inertial
-   src/stereo_inertial_node.cc
-   src/common.cc
-)
-target_link_libraries(${PROJECT_NAME}_stereo_inertial
-   ${LIBS}
-)
+# # stereo-inertial node
+# add_executable (${PROJECT_NAME}_stereo_inertial
+#    src/stereo_inertial_node.cc
+#    src/common.cc
+# )
+# target_link_libraries(${PROJECT_NAME}_stereo_inertial
+#    ${LIBS}
+# )
 
-# RGB-D node
-add_executable (${PROJECT_NAME}_rgbd
-   src/rgbd_node.cc
-   src/common.cc
-)
-target_link_libraries(${PROJECT_NAME}_rgbd
-   ${LIBS}
-)
+# # RGB-D node
+# add_executable (${PROJECT_NAME}_rgbd
+#    src/rgbd_node.cc
+#    src/common.cc
+# )
+# target_link_libraries(${PROJECT_NAME}_rgbd
+#    ${LIBS}
+# )
